@@ -6,7 +6,7 @@ from .core import RUST_AVAILABLE
 
 class JIGGLE_PT_Main(bpy.types.Panel):
     """Panel principal en la barra lateral del Viewport 3D."""
-    bl_label = "Jiggle Physics v1.3"
+    bl_label = "Jiggle Physics v1.0"
     bl_idname = "VIEW3D_PT_jiggle_v1"
     bl_space_type = 'VIEW_3D'
     bl_region_type = 'UI'

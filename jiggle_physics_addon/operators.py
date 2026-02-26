@@ -112,6 +112,10 @@ class JIGGLE_OT_manager(bpy.types.Operator):
             emp_rest.parent_type = 'BONE' if parent_name else 'OBJECT'
             if parent_name:
                 emp_rest.parent_bone = parent_name
+            
+            # TRUCO VITAL: Forzar a Blender a registrar el parentesco ANTES de moverlo
+            bpy.context.view_layer.update()
+            
             emp_rest.matrix_world = Matrix.Translation(bone_tail)
             emp_rest.hide_select = True
 
@@ -137,10 +141,11 @@ class JIGGLE_OT_manager(bpy.types.Operator):
         for postfix in ["_j_spring", "_j_rest"]:
             emp = bpy.data.objects.get(self.bone_name + postfix)
             if emp:
-                bpy.data.objects.remove(emp)
+                bpy.data.objects.remove(emp, do_unlink=True)
 
     def _stop_all(self, context, obj, active_set):
         context.scene.jiggle_is_running = False
+        # 1. Clean bones from the current armature
         for b_n in active_set:
             pb = obj.pose.bones.get(b_n)
             if pb:
@@ -150,12 +155,20 @@ class JIGGLE_OT_manager(bpy.types.Operator):
                 for k in ["j_stiff", "j_damp", "j_gravity", "j_vel"]:
                     if k in pb:
                         del pb[k]
+            # 2. Remove empties even if bone wasn't found in armature
+            for postfix in ["_j_spring", "_j_rest"]:
+                emp = bpy.data.objects.get(b_n + postfix)
+                if emp:
+                    bpy.data.objects.remove(emp, do_unlink=True)
         active_set.clear()
+        # 3. Remove the collection itself
         jiggle_col = bpy.data.collections.get("JigglePhysics")
         if jiggle_col:
-            for ob in list(jiggle_col.objects):
-                bpy.data.objects.remove(ob)
             bpy.data.collections.remove(jiggle_col)
+        # 4. Global sweep: purge any leftover _j_spring/_j_rest empties
+        for ob in list(bpy.data.objects):
+            if ob.name.endswith("_j_spring") or ob.name.endswith("_j_rest"):
+                bpy.data.objects.remove(ob, do_unlink=True)
 
 
 class JIGGLE_OT_start(bpy.types.Operator):
@@ -206,12 +219,15 @@ class JIGGLE_OT_info(bpy.types.Operator):
 
     def draw(self, context):
         layout = self.layout
-        layout.label(text="Jiggle Physics v1.3 (Rust + Gravedad)", icon='SOLO_ON')
+        layout.label(text="Jiggle Physics v1.0", icon='SOLO_ON')
         layout.label(text="Author: Dani blender")
         layout.operator("jiggle.open_link", text="YouTube Channel", icon='URL')
 
-    def execute(self, context):
+    def invoke(self, context, event):
         return context.window_manager.invoke_props_dialog(self, width=250)
+
+    def execute(self, context):
+        return {'FINISHED'}
 
 
 class JIGGLE_OT_open_link(bpy.types.Operator):

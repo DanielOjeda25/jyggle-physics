@@ -10,12 +10,13 @@ from .operators import (
 from .ui import JIGGLE_PT_Main
 
 bl_info = {
-    "name": "Jiggle Physics (Rust Powered)",
+    "name": "Jiggle Physics",
     "author": "Dani blender",
-    "version": (1, 3, 0),
+    "version": (1, 0, 0),
     "blender": (5, 0, 0),
     "location": "View3D > Sidebar > Jiggle",
-    "description": "Professional spring dynamics powered by Rust with Gravity.",
+    "description": "Añade dinámicas de físicas en tiempo real (spring bones) a tus armaduras de forma profesional.",
+    "doc_url": "https://www.youtube.com/@daniblender",
     "category": "Animation",
 }
 
