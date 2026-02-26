@@ -12,10 +12,10 @@ from .ui import JIGGLE_PT_Main
 bl_info = {
     "name": "Jiggle Physics (Rust Powered)",
     "author": "Dani blender",
-    "version": (1, 2, 0),
+    "version": (1, 3, 0),
     "blender": (5, 0, 0),
     "location": "View3D > Sidebar > Jiggle",
-    "description": "Professional spring dynamics powered by Rust.",
+    "description": "Professional spring dynamics powered by Rust with Gravity.",
     "category": "Animation",
 }
 

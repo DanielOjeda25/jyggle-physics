@@ -57,16 +57,22 @@ class JIGGLE_OT_manager(bpy.types.Operator):
                 continue
 
             chosen = self.p_type if self.p_type else 'BREASTS'
-            for p_n, p_d in JIGGLE_PRESETS.items():
-                if any(k in pb.name.lower() for k in p_d['keys']):
-                    chosen = p_n
-                    break
+            if self.action in ["ADD_SMART", "RESET_BONE"]:
+                for p_n, p_d in JIGGLE_PRESETS.items():
+                    if any(k in pb.name.lower() for k in p_d['keys']):
+                        chosen = p_n
+                        break
             conf = JIGGLE_PRESETS[chosen]
 
-            pb["j_stiff"], pb["j_damp"] = conf['stiff'], conf['damp']
-            pb["j_gravity"] = conf.get('gravity', 0.0)
-            for key, val in [("j_stiff", 1.0), ("j_damp", 1.0), ("j_gravity", 0.5)]:
-                pb.id_properties_ui(key).update(min=0.0, max=val, soft_min=0.0, soft_max=val)
+            # Configuración de propiedades del hueso
+            pb["j_stiff"] = conf['stiff']
+            pb["j_damp"] = conf['damp']
+            pb["j_gravity"] = conf.get('gravity', 0.05)
+
+            pb.id_properties_ui("j_stiff").update(min=0.0, max=1.0, soft_min=0.0, soft_max=1.0)
+            pb.id_properties_ui("j_damp").update(min=0.0, max=1.0, soft_min=0.0, soft_max=1.0)
+            pb.id_properties_ui("j_gravity").update(min=-1.0, max=1.0, soft_min=-1.0, soft_max=1.0)
+
             pb["j_vel"] = [0.0, 0.0, 0.0]
 
             bone_tail = obj.matrix_world @ pb.tail
@@ -151,7 +157,7 @@ class JIGGLE_OT_start(bpy.types.Operator):
         if not context.scene.jiggle_is_running:
             return self.cancel(context)
         if event.type == 'TIMER':
-            if getattr(context.screen, 'is_animation_playing', False) is False:
+            if getattr(context.screen, 'is_animation_playing', False) == False:
                 deps = context.evaluated_depsgraph_get()
                 update_jiggle_physics(context.scene, deps)
         return {'PASS_THROUGH'}
@@ -189,7 +195,7 @@ class JIGGLE_OT_info(bpy.types.Operator):
 
     def draw(self, context):
         layout = self.layout
-        layout.label(text="Jiggle Physics v1.2 (Rust)", icon='SOLO_ON')
+        layout.label(text="Jiggle Physics v1.3 (Rust + Gravedad)", icon='SOLO_ON')
         layout.label(text="Author: Dani blender")
         layout.operator("jiggle.open_link", text="YouTube Channel", icon='URL')
 

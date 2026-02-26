@@ -2,13 +2,20 @@ import bpy
 from bpy.app.handlers import persistent
 
 # --- IMPORTAMOS NUESTRO MOTOR RUST ---
+# Intentamos importación relativa (para cuando esté en formato ZIP)
+# y si falla, intentamos importación local (para cuando usas el editor de texto de Blender)
 try:
     from . import jiggle_rust_core
     RUST_AVAILABLE = True
-    print("¡Motor Jiggle Rust cargado correctamente!")
+    print("¡Motor Jiggle Rust cargado correctamente (Modo Add-on)!")
 except ImportError:
-    RUST_AVAILABLE = False
-    print("ADVERTENCIA: No se encontró 'jiggle_rust_core'. Las físicas no se ejecutarán.")
+    try:
+        import jiggle_rust_core
+        RUST_AVAILABLE = True
+        print("¡Motor Jiggle Rust cargado correctamente (Modo Local)!")
+    except ImportError:
+        RUST_AVAILABLE = False
+        print("ADVERTENCIA: No se encontró 'jiggle_rust_core'. Las físicas no se ejecutarán.")
 
 
 def update_jiggle_physics(scene, deps):
@@ -37,7 +44,9 @@ def update_jiggle_physics(scene, deps):
 
             stiff = max(0.001, min(pb["j_stiff"], 1.0))
             damp = max(0.0, min(pb["j_damp"], 0.99))
-            gravity = max(0.0, min(pb.get("j_gravity", 0.0), 1.0))
+
+            # --- Extraemos la gravedad de las propiedades del hueso ---
+            gravity = float(pb.get("j_gravity", 0.05))
 
             emp_rest_eval = emp_rest.evaluated_get(deps)
 
@@ -57,6 +66,7 @@ def update_jiggle_physics(scene, deps):
             current_vel_list = [float(vel_data[0]), float(vel_data[1]), float(vel_data[2])]
 
             try:
+                # --- Pasamos la gravedad a Rust ---
                 new_pos, new_vel = jiggle_rust_core.calcular_fisica_frame(
                     rest_pos_list,
                     spring_pos_list,

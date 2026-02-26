@@ -6,7 +6,7 @@ from .core import RUST_AVAILABLE
 
 class JIGGLE_PT_Main(bpy.types.Panel):
     """Panel principal en la barra lateral del Viewport 3D."""
-    bl_label = "Jiggle Physics v1.2"
+    bl_label = "Jiggle Physics v1.3"
     bl_idname = "VIEW3D_PT_jiggle_v1"
     bl_space_type = 'VIEW_3D'
     bl_region_type = 'UI'
@@ -33,7 +33,7 @@ class JIGGLE_PT_Main(bpy.types.Panel):
 
         # Preset buttons
         box = layout.box()
-        box.label(text="1. Apply to Selection:", icon='RESTRICT_SELECT_OFF')
+        box.label(text="Apply to Selection:", icon='RESTRICT_SELECT_OFF')
         row = box.row(align=True)
         for name, data in JIGGLE_PRESETS.items():
             op = row.operator("jiggle.manager", text=name, icon=data['icon'])
@@ -59,13 +59,14 @@ class JIGGLE_PT_Main(bpy.types.Panel):
                     col = b_box.column(align=True)
                     col.prop(pb, '["j_stiff"]', text="Stiffness", slider=True)
                     col.prop(pb, '["j_damp"]', text="Damping", slider=True)
+                    # --- Slider de Gravedad en el panel de control ---
                     col.prop(pb, '["j_gravity"]', text="Gravity", slider=True)
 
         # Start / Stop controls
         layout.separator()
         col = layout.column(align=True)
         if not scene.jiggle_is_running:
-            col.operator("jiggle.start", text="Start Physics (Rust)", icon='PLAY')
+            col.operator("jiggle.start", text="Start Physics", icon='PLAY')
         else:
             col.operator("jiggle.start", text="Stop Physics", icon='PAUSE')
         col.operator("jiggle.manager", text="Clear & Reset All", icon='X').action = "STOP"
