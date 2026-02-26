@@ -37,6 +37,7 @@ def update_jiggle_physics(scene, deps):
 
             stiff = max(0.001, min(pb["j_stiff"], 1.0))
             damp = max(0.0, min(pb["j_damp"], 0.99))
+            gravity = max(0.0, min(pb.get("j_gravity", 0.0), 1.0))
 
             emp_rest_eval = emp_rest.evaluated_get(deps)
 
@@ -62,6 +63,7 @@ def update_jiggle_physics(scene, deps):
                     current_vel_list,
                     stiff,
                     damp,
+                    gravity,
                 )
             except Exception as e:
                 print(f"Error en el cálculo de Rust: {e}")

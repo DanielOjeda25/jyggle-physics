@@ -59,6 +59,7 @@ class JIGGLE_PT_Main(bpy.types.Panel):
                     col = b_box.column(align=True)
                     col.prop(pb, '["j_stiff"]', text="Stiffness", slider=True)
                     col.prop(pb, '["j_damp"]', text="Damping", slider=True)
+                    col.prop(pb, '["j_gravity"]', text="Gravity", slider=True)
 
         # Start / Stop controls
         layout.separator()

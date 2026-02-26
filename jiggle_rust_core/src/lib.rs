@@ -7,10 +7,12 @@ fn calcular_fisica_frame(
     current_vel: [f32; 3],
     stiff: f32,
     damp: f32,
+    gravity: f32,
 ) -> PyResult<([f32; 3], [f32; 3])> {
+
     let force_x = rest_pos[0] - spring_pos[0];
     let force_y = rest_pos[1] - spring_pos[1];
-    let force_z = rest_pos[2] - spring_pos[2];
+    let force_z = rest_pos[2] - spring_pos[2] - gravity;
 
     let mut new_vel_x = current_vel[0] + (force_x * stiff);
     let mut new_vel_y = current_vel[1] + (force_y * stiff);

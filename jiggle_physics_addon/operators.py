@@ -64,7 +64,8 @@ class JIGGLE_OT_manager(bpy.types.Operator):
             conf = JIGGLE_PRESETS[chosen]
 
             pb["j_stiff"], pb["j_damp"] = conf['stiff'], conf['damp']
-            for key, val in [("j_stiff", 1.0), ("j_damp", 1.0)]:
+            pb["j_gravity"] = conf.get('gravity', 0.0)
+            for key, val in [("j_stiff", 1.0), ("j_damp", 1.0), ("j_gravity", 0.5)]:
                 pb.id_properties_ui(key).update(min=0.0, max=val, soft_min=0.0, soft_max=val)
             pb["j_vel"] = [0.0, 0.0, 0.0]
 
@@ -113,7 +114,7 @@ class JIGGLE_OT_manager(bpy.types.Operator):
             cns = pb.constraints.get("Jiggle_Track")
             if cns:
                 pb.constraints.remove(cns)
-            for k in ["j_stiff", "j_damp", "j_vel"]:
+            for k in ["j_stiff", "j_damp", "j_gravity", "j_vel"]:
                 if k in pb:
                     del pb[k]
         for postfix in ["_j_spring", "_j_rest"]:
@@ -129,7 +130,7 @@ class JIGGLE_OT_manager(bpy.types.Operator):
                 cns = pb.constraints.get("Jiggle_Track")
                 if cns:
                     pb.constraints.remove(cns)
-                for k in ["j_stiff", "j_damp", "j_vel"]:
+                for k in ["j_stiff", "j_damp", "j_gravity", "j_vel"]:
                     if k in pb:
                         del pb[k]
         active_set.clear()
