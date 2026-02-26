@@ -47,7 +47,18 @@ class JIGGLE_OT_manager(bpy.types.Operator):
             if layer_col:
                 layer_col.hide_viewport = True
 
-        bones = [obj.pose.bones.get(self.bone_name)] if self.bone_name else context.selected_pose_bones
+        # Detección robusta de huesos: usa bone_name si se especificó (ej. desde Reset),
+        # si no, usa la selección actual + el hueso activo como fallback.
+        if self.bone_name:
+            bones = [obj.pose.bones.get(self.bone_name)]
+        else:
+            selected = list(context.selected_pose_bones) if context.selected_pose_bones else []
+            active = context.active_pose_bone
+            # Si el activo no está en la selección, lo agregamos
+            if active and active not in selected:
+                selected.append(active)
+            bones = selected
+
         if not bones:
             self.report({'WARNING'}, "Selecciona al menos un hueso.")
             return
