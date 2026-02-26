@@ -1,0 +1,10 @@
+# Rust build artifacts
+target/
+wheel_extracted/
+
+# Python
+__pycache__/
+*.pyc
+
+# Helper scripts (not needed in repo)
+install_to_blender.py
